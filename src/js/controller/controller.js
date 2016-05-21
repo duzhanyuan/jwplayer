@@ -226,10 +226,25 @@ define([
                 });
 
                 if (_model.get('autostart')) {
-                    _play({reason: 'autostart'});
+                    _this.play({reason: 'autostart'});
                 }
 
-                _executeQueuedEvents();
+                var playlist = _model.get('playlist');
+                _loadProvidersForPlaylist(playlist);
+            }
+
+            function _loadProvidersForPlaylist(playlist) {
+                var providersManager = _model.getProviders();
+                var providersNeeded = providersManager.required(playlist, _model.get('edition'));
+
+                return Providers.load(providersNeeded)
+                    .then(function() {
+                        if (!_this.getProvider()) {
+                            _model.setProvider(_model.get('playlistItem'));
+
+                            _executeQueuedEvents();
+                        }
+                    });
             }
 
             function _executeQueuedEvents() {
@@ -257,17 +272,8 @@ define([
                         break;
                     case 'object':
                         var playlist = Playlist(item);
-                        var providersManager = _model.getProviders();
-                        var providersNeeded = providersManager.required(playlist, _model.get('edition'));
 
-                        Providers.load(providersNeeded)
-                            .then(function() {
-                                if (!_this.getProvider()) {
-                                    _model.setProvider(_model.get('playlistItem'));
-
-                                    _executeQueuedEvents();
-                                }
-                            });
+                        _loadProvidersForPlaylist(playlist);
 
                         var success = _setPlaylist(item);
                         if (success) {
@@ -338,6 +344,7 @@ define([
                     }
 
                     status = utils.tryCatch(function() {
+                        // FIXME: playAttempt is not triggered until this is called. Should be on play()
                         _model.loadVideo();
                     });
                 } else if (_model.get('state') === states.PAUSED) {

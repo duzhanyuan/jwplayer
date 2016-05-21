@@ -5,6 +5,7 @@ define([
     'unit/ajax-test',
     'unit/browser-test',
     'unit/constants-test',
+    'unit/controller-test',
     'unit/css-test',
     'unit/dom-test',
     'unit/dxfp-test',
