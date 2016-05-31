@@ -50,6 +50,15 @@ define([
             var backgroundImage = '';
             if (_.isString(img)) {
                 backgroundImage = 'url("' + img + '")';
+
+                // Save the background image's width and height for resize check in view.js
+                var image = new Image();
+                image.src = img;
+                this.width = image.width;
+                this.height = image.height;
+            } else {
+                this.width = 0;
+                this.height = 0;
             }
             utils.style(this.el, {
                 backgroundImage: backgroundImage

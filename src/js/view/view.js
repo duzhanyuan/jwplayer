@@ -698,6 +698,17 @@ define([
 
             // pass width, height from jwResize if present
             _resizeMedia(width, height);
+
+            if (_this.model.get('stretching') === 'uniform' && _preview) {
+                // snap image to edges when the difference in aspect ratio is less than 9%
+                var playerAspectRatio = _playerElement.clientWidth / _playerElement.clientHeight;
+                var imageAspectRatio = _preview.width / _preview.height;
+                if (Math.abs(playerAspectRatio - imageAspectRatio) < 0.09) {
+                    utils.css.style(_preview.el, {
+                        backgroundSize: 'cover'
+                    });
+                }
+            }
         }
 
         function _checkAudioMode(height) {
